@@ -1,62 +1,109 @@
 package com.thanhan.covidshield;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.util.Log;
+import android.view.View;
 
-import com.huawei.hms.hmsscankit.ScanUtil;
-import com.huawei.hms.ml.scan.HmsScan;
-import com.huawei.hms.ml.scan.HmsScanAnalyzerOptions;
+import com.huawei.hmf.tasks.OnFailureListener;
+import com.huawei.hmf.tasks.OnSuccessListener;
+import com.huawei.hmf.tasks.Task;
+import com.huawei.hms.common.ApiException;
+import com.huawei.hms.support.account.AccountAuthManager;
+import com.huawei.hms.support.account.request.AccountAuthParams;
+import com.huawei.hms.support.account.request.AccountAuthParamsHelper;
+import com.huawei.hms.support.account.result.AuthAccount;
+import com.huawei.hms.support.account.service.AccountAuthService;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int CAMERA_REQ_CODE = 100;
-    private static final int REQUEST_CODE_SCAN_ONE = 222;
-    final int PERMISSIONS_LENGTH = 2;
+    // AccountAuthService provides a set of APIs, including silentSignIn, getSignInIntent, and signOut.
+    private AccountAuthService mAuthService;
+    // Set HUAWEI ID sign-in authorization parameters.
+    private AccountAuthParams mAuthParam;
+    // Define the request code for signInIntent.
+    private static final int REQUEST_CODE_SIGN_IN = 1000;
+    // Define the log tag.
+    private static final String TAG = "Account";
 
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // CAMERA_REQ_CODE is user-defined and is used to receive the request code of the permission verification result.
-        this.requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE}, CAMERA_REQ_CODE);
-        // QRCODE_SCAN_TYPE and DATAMATRIX_SCAN_TYPE are set for the barcode format, indicating that Scan Kit will support only QR code and Data Matrix.
-        HmsScanAnalyzerOptions options = new HmsScanAnalyzerOptions.Creator().setHmsScanTypes(HmsScan.ALL_SCAN_TYPE, HmsScan.ALL_SCAN_TYPE).create();
-        ScanUtil.startScan(this, REQUEST_CODE_SCAN_ONE, options);
+
+        findViewById(R.id.HuaweiIdAuthButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                silentSignInByHwId();
+            }
+        });
     }
-    // Use the onRequestPermissionsResult function to receive the permission verification result.
+    private void silentSignInByHwId() {
+        // 1. Use AccountAuthParams to specify the user information to be obtained, including the user ID (OpenID and UnionID), email address, and profile (nickname and picture).
+        // 2. By default, DEFAULT_AUTH_REQUEST_PARAM specifies two items to be obtained, that is, the user ID and profile.
+        // 3. If your app needs to obtain the user's email address, call setEmail().
+        mAuthParam = new AccountAuthParamsHelper(AccountAuthParams.DEFAULT_AUTH_REQUEST_PARAM)
+                .setEmail()
+                .createParams();
+        // Use AccountAuthParams to build AccountAuthService.
+        mAuthService = AccountAuthManager.getService(this, mAuthParam);
+        // Use silent sign-in to sign in with a HUAWEI ID.
+        Task<AuthAccount> task = mAuthService.silentSignIn();
+        task.addOnSuccessListener(new OnSuccessListener<AuthAccount>() {
+            @Override
+            public void onSuccess(AuthAccount authAccount) {
+                // The silent sign-in is successful. Process the returned account object AuthAccount to obtain the HUAWEI ID information.
+                dealWithResultOfSignIn(authAccount);
+                Intent intent = new Intent(MainActivity.this, UserInfo.class);
+                intent.putExtra("name", authAccount.getDisplayName());
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        // Check whether requestCode is set to the value of CAMERA_REQ_CODE during permission application, and then check whether the permission is enabled.
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == CAMERA_REQ_CODE && grantResults.length == PERMISSIONS_LENGTH && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-            // Call the barcode scanning API to build the scanning capability.
-
-        }
+                startActivity(intent);
+            }
+        });
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                // The silent sign-in fails. Use the getSignInIntent() method to show the authorization or sign-in screen.
+                if (e instanceof ApiException) {
+                    ApiException apiException = (ApiException) e;
+                    Intent signInIntent = mAuthService.getSignInIntent();
+                    startActivityForResult(signInIntent, REQUEST_CODE_SIGN_IN);
+                }
+            }
+        });
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != RESULT_OK || data == null) {
-            return;
-        }
-        if (requestCode == REQUEST_CODE_SCAN_ONE) {
-            // Input an image for scanning and return the result.
-            HmsScan obj = data.getParcelableExtra(ScanUtil.RESULT);
-            if (obj != null) {
-                // Display the parsing result.
-                Toast.makeText(MainActivity.this, "result after scan"+obj.originalValue+"\n"+obj.describeContents(), Toast.LENGTH_LONG).show();
+        if (requestCode == REQUEST_CODE_SIGN_IN) {
+            Log.i(TAG, "onActivitResult of sigInInIntent, request code: " + REQUEST_CODE_SIGN_IN);
+            Task<AuthAccount> authAccountTask = AccountAuthManager.parseAuthResultFromIntent(data);
+            if (authAccountTask.isSuccessful()) {
+                // The sign-in is successful, and the authAccount object that contains the HUAWEI ID information is obtained.
+                AuthAccount authAccount = authAccountTask.getResult();
+                dealWithResultOfSignIn(authAccount);
+                Log.i(TAG, "onActivitResult of sigInInIntent, request code: " + REQUEST_CODE_SIGN_IN);
+            } else {
+                // The sign-in fails. Find the failure cause from the status code. For more information, please refer to the "Error Codes" section in the API Reference.
+                Log.e(TAG, "sign in failed : " +((ApiException)authAccountTask.getException()).getStatusCode());
             }
         }
+    }
+    /**
+     * Process the returned AuthAccount object to obtain the HUAWEI ID information.
+     *
+     * @param authAccount AuthAccount object, which contains the HUAWEI ID information.
+     */
+    private void dealWithResultOfSignIn(AuthAccount authAccount) {
+        // Obtain the HUAWEI DI information.
+        Log.i(TAG, "display name:" + authAccount.getDisplayName());
+        Log.i(TAG, "photo uri string:" + authAccount.getAvatarUriString());
+        Log.i(TAG, "photo uri:" + authAccount.getAvatarUri());
+        Log.i(TAG, "email:" + authAccount.getEmail());
+        Log.i(TAG, "openid:" + authAccount.getOpenId());
+        Log.i(TAG, "unionid:" + authAccount.getUnionId());
+        // TODO: Implement service logic after the HUAWEI ID information is obtained.
     }
 }
