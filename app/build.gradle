@@ -18,7 +18,7 @@ android {
 
     signingConfigs {
         config {
-            storeFile file('D:\\CovidShield\\app\\covidshield.jks')
+            storeFile file('D:\\FinalHuawei\\CovidShield\\app\\covidshield.jks')
             storePassword '06072001'
             keyPassword '06072001'
             keyAlias 'covidshield'
@@ -50,5 +50,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation 'com.huawei.hms:scan:1.2.5.300'
     implementation 'com.huawei.hms:site:5.0.5.301'
+    implementation 'com.huawei.hms:hwid:6.0.1.300'
 }
 apply plugin: 'com.huawei.agconnect'
