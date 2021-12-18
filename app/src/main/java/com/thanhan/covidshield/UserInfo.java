@@ -2,6 +2,7 @@ package com.thanhan.covidshield;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -36,6 +37,14 @@ public class UserInfo extends AppCompatActivity {
 
         info.setText("Welcome " + getIntent().getStringExtra("name") + " !");
 
+        findViewById(R.id.btn_scan).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(),ScanCode.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         findViewById(R.id.btn_signout).setOnClickListener(new View.OnClickListener() {
             @Override

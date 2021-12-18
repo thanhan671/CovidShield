@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.huawei.hms.hmsscankit.ScanUtil;
@@ -27,12 +29,25 @@ public class ScanCode extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_code);
-        setContentView(R.layout.activity_main);
         // CAMERA_REQ_CODE is user-defined and is used to receive the request code of the permission verification result.
         this.requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE}, CAMERA_REQ_CODE);
         // QRCODE_SCAN_TYPE and DATAMATRIX_SCAN_TYPE are set for the barcode format, indicating that Scan Kit will support only QR code and Data Matrix.
         HmsScanAnalyzerOptions options = new HmsScanAnalyzerOptions.Creator().setHmsScanTypes(HmsScan.ALL_SCAN_TYPE, HmsScan.ALL_SCAN_TYPE).create();
         ScanUtil.startScan(this, REQUEST_CODE_SCAN_ONE, options);
+
+        findViewById(R.id.btn_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        findViewById(R.id.btn_access).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                
+            }
+        });
     }
     // Use the onRequestPermissionsResult function to receive the permission verification result.
 
@@ -57,7 +72,6 @@ public class ScanCode extends AppCompatActivity {
             HmsScan obj = data.getParcelableExtra(ScanUtil.RESULT);
             if (obj != null) {
                 // Display the parsing result.
-                /*Toast.makeText(ScanCode.this, "result after scan" + obj.originalValue + "\n" + obj.describeContents(), Toast.LENGTH_LONG).show();*/
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(obj.originalValue);
                 builder.setTitle("Result Scan");
@@ -65,12 +79,8 @@ public class ScanCode extends AppCompatActivity {
                 builder.setPositiveButton("Next", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
+                        TextView link = (TextView) findViewById(R.id.tv_link);
+                        link.setText(obj.originalValue);
                     }
                 });
                 AlertDialog dialog = builder.create();
