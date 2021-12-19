@@ -40,7 +40,7 @@ public class UserInfo extends AppCompatActivity {
         findViewById(R.id.btn_scan).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(),ScanCode.class);
+                Intent intent = new Intent(UserInfo.this,ScanCode.class);
                 startActivity(intent);
                 finish();
             }

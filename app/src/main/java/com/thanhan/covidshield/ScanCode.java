@@ -23,6 +23,8 @@ public class ScanCode extends AppCompatActivity {
     private static final int CAMERA_REQ_CODE = 100;
     private static final int REQUEST_CODE_SCAN_ONE = 222;
     final int PERMISSIONS_LENGTH = 2;
+    String slink;
+    TextView link;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -35,6 +37,8 @@ public class ScanCode extends AppCompatActivity {
         HmsScanAnalyzerOptions options = new HmsScanAnalyzerOptions.Creator().setHmsScanTypes(HmsScan.ALL_SCAN_TYPE, HmsScan.ALL_SCAN_TYPE).create();
         ScanUtil.startScan(this, REQUEST_CODE_SCAN_ONE, options);
 
+        link = (TextView) findViewById(R.id.tv_link);
+
         findViewById(R.id.btn_back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -45,7 +49,10 @@ public class ScanCode extends AppCompatActivity {
         findViewById(R.id.btn_access).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+                slink = link.getText().toString().trim();
+                Intent intent = new Intent(getApplicationContext(),DisplayLink.class);
+                intent.putExtra("link", slink);
+                startActivity(intent);
             }
         });
     }
@@ -79,7 +86,6 @@ public class ScanCode extends AppCompatActivity {
                 builder.setPositiveButton("Next", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        TextView link = (TextView) findViewById(R.id.tv_link);
                         link.setText(obj.originalValue);
                     }
                 });

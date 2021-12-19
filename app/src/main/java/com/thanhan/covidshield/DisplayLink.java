@@ -2,6 +2,7 @@ package com.thanhan.covidshield;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.KeyboardShortcutGroup;
@@ -13,17 +14,21 @@ import android.webkit.WebViewClient;
 public class DisplayLink extends AppCompatActivity {
 
     WebView web;
+    String slink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_link);
 
+        Intent intent = getIntent();
+        slink = intent.getStringExtra("link");
+
         web = findViewById(R.id.webView);
         WebSettings webSettings = web.getSettings();
         webSettings.setJavaScriptEnabled(true);
         web.setWebViewClient(new Callback());
-        web.loadUrl("");
+        web.loadUrl(slink);
     }
 
     private class Callback extends WebViewClient {
