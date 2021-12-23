@@ -28,12 +28,16 @@ public class DisplayLink extends AppCompatActivity {
         WebSettings webSettings = web.getSettings();
         webSettings.setJavaScriptEnabled(true);
         web.setWebViewClient(new Callback());
-        web.loadUrl(slink);
+        if (slink.equals("No result")==true) {
+            web.loadUrl("https://google.com");
+        } else {
+            web.loadUrl(slink);
+        }
     }
 
     private class Callback extends WebViewClient {
         @Override
-        public boolean shouldOverrideKeyEvent(WebView view, KeyEvent event){
+        public boolean shouldOverrideKeyEvent(WebView view, KeyEvent event) {
             return false;
         }
     }
