@@ -1,12 +1,10 @@
-package com.thanhan.covidshield;
+package com.thanhan.WScan;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.KeyboardShortcutGroup;
-import android.view.Window;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;

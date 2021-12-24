@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.thanhan.covidshield">
+    package="com.thanhan.WScan">
     <!-- Camera permission -->
     <uses-permission android:name="android.permission.CAMERA" /> <!-- File read permission -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -16,16 +16,16 @@
     <application
         android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="true"
-        android:icon="@drawable/logo"
-        android:label="@string/app_name"
-        android:roundIcon="@drawable/logo"
+        android:icon="@drawable/barcode"
+        android:label="WScan - Scan to Web"
+        android:roundIcon="@drawable/barcode"
         android:supportsRtl="true"
         android:theme="@style/Theme.CovidShield">
         <activity
-            android:name=".DisplayLink"
+            android:name="com.thanhan.WScan.DisplayLink"
             android:exported="false" />
         <activity
-            android:name=".SplashActivity"
+            android:name="com.thanhan.WScan.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,13 +34,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".UserInfo"
+            android:name="com.thanhan.WScan.UserInfo"
             android:exported="false" />
         <activity
-            android:name=".ScanCode"
+            android:name="com.thanhan.WScan.ScanCode"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name="com.thanhan.WScan.MainActivity"
             android:exported="false" />
 
         <meta-data

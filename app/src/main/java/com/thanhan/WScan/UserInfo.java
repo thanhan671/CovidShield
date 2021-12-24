@@ -1,4 +1,4 @@
-package com.thanhan.covidshield;
+package com.thanhan.WScan;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.huawei.hmf.tasks.OnFailureListener;
@@ -14,9 +13,6 @@ import com.huawei.hmf.tasks.OnSuccessListener;
 import com.huawei.hmf.tasks.Task;
 import com.huawei.hms.support.account.request.AccountAuthParams;
 import com.huawei.hms.support.account.service.AccountAuthService;
-
-import java.time.Instant;
-import java.time.temporal.TemporalAdjuster;
 
 public class UserInfo extends AppCompatActivity {
     // AccountAuthService provides a set of APIs, including silentSignIn, getSignInIntent, and signOut.

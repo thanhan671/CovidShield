@@ -1,4 +1,4 @@
-package com.thanhan.covidshield;
+package com.thanhan.WScan;
 
 import org.junit.Test;
 
